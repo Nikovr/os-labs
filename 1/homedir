@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ "$1" = "-h" ]
+then
+echo "This script determins, whether you are running the script from its home directory"
+exit
+fi
+
+cur_dir=$(pwd)
+
+if [ "$cur_dir" == "$HOME" ]
+then
+echo "$cur_dir"
+exit 0
+fi
+
+echo "error: You are not in the home directory"
+exit 1
+

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+if [[ "$1" == "-h" && -z "$2" ]]
+then
+echo "This script creates a file emails.lst, which contains of all emails found in /etc"
+exit
+fi
+
+directory="/etc"
+
+if ! [ -d $directory ]
+then
+echo "error: /etc directory does not exist"
+exit
+fi
+
+if [ -f "./emails.lst" ]
+then
+rm "./emails.lst"
+fi
+
+touch "./emails.lst"
+
+for file in $directory/*
+do
+	if [[ -f $file && -r $file ]]
+	then
+	grep -oP "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,6}$" $file | tr $"\n" ","  >> "./emails.lst"
+	fi
+done
+
+truncate -s-1 "./emails.lst"

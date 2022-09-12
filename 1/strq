@@ -1,0 +1,30 @@
+#!/bin/bash
+
+IFS=""
+
+if [[ "$1" == "-h" && -z $2 ]]
+then
+echo "This script reads lines from the command line until it is given a 'q' string and then prints those strings out in a single line"
+exit
+fi
+
+if ! [ -z $1 ]
+then
+echo "warning: No arguments are needed for the script to work (./strq -h for help)"
+fi
+
+sumstr=""
+
+while true
+do
+	read str
+
+	if [ $str == "q" ]
+	then
+	break
+	fi
+
+	sumstr+=$str
+done
+
+echo $sumstr

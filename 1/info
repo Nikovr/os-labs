@@ -1,0 +1,39 @@
+#!/bin/bash
+
+if [[ "$1" == "-h" && -z "$2" ]]
+then
+echo "This script creates a file info.log, which contains of all INFO lines from syslog"
+exit
+fi
+
+file="/var/log/anaconda/syslog"
+
+if ! [ -f $file ]
+then
+echo "error: File syslog does not exist"
+exit
+fi
+
+new_file="./info.log"
+
+if [ -f $new_file ]
+then
+rm $new_file
+fi
+
+touch $new_file 
+
+IFS=$'\n'
+for str in $(cat $file)
+do
+	IFS=$' '
+	for entry in $str
+	do
+		if [ $entry == "INFO" ]
+		then
+		echo $str >> $new_file
+		break
+		fi
+	done
+	IFS=$'\n'
+done

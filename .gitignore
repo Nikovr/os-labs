@@ -1,0 +1,2 @@
+# should ingore all log files
+*.log

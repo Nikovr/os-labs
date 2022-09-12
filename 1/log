@@ -1,0 +1,37 @@
+#!/bin/bash
+
+if [[ "$1" == "-h" && -z "$2" ]]
+then
+echo "This script counts how many lines there are in every .log file that is readable by you in /var/log"
+exit
+fi
+
+directory="/var/log"
+
+if ! [ -d $directory ]
+then
+echo "error: /var/log directory does not exist"
+exit
+fi
+
+count_line=0
+for file in $directory/*.log
+do
+	if [ -f $file ]
+	then
+		if [ -r $file ]
+		then
+			OIFS=$IFS
+			IFS=$'\n'
+			for line in $(cat $file)
+			do
+				count_line=$[$count_line +1]
+			done
+			IFS=$OIFS
+		else
+			echo -e "warning: $file is not readable by you, root rights are needed\n"
+		fi
+	fi
+done
+
+echo $count_line
