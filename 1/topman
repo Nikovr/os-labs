@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [[ $1 = "-h" && -z $2 ]]
+then
+	echo "This scrtipt prints out top 3 most used words (longer than 3 characters) in man bash"
+	exit
+fi
+
+echo $(MANWIDTH=160 man bash | tr '[:upper:]' '[:lower:]' | grep -oE '[a-z]{4,}' | sort | uniq -c | sort -nr | head -3 | grep -oE '[a-z]+')

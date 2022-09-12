@@ -1,0 +1,55 @@
+#!/bin/bash
+
+if [[ $1 == "-h" && -z $2 ]]
+then
+echo "This script shows you the list of users and their UIDs"
+exit
+fi
+
+if ! [ -f "/etc/passwd" ]
+then
+echo "error: File passwd doesn't exist"
+exit
+fi
+
+if ! [ -r "/etc/passwd" ]
+then
+echo "error: Permission denied"
+exit
+fi
+
+passwd="/etc/passwd"
+
+array=()
+
+sort () {
+	for ((i=0; i <= $((${#array[@]} - 2)); ++i))
+	do
+		for ((j=((i + 1)); j <= ((${#array[@]} -1)); ++j))
+		do
+			IFS=" "
+			a=(${array[i]})
+			a=${a[1]}
+			b=(${array[j]})
+			b=${b[1]}
+
+			if [ $a -gt $b ]
+			then
+			tmp=${array[i]}
+			array[i]=${array[j]}
+			array[j]=$tmp
+			fi
+		done
+	done
+}
+
+IFS=$'\n'
+ind=0
+for line in $(cat $passwd)
+do
+	array[$ind]=$({ echo $line | cut -d: -f1; echo $line | cut -d: -f3; } | tr "\n" " ")
+	ind=$ind+1
+done
+
+sort ${array[@]}
+printf '%s\n' "${array[@]}" | less
