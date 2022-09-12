@@ -7,11 +7,10 @@ exit
 fi
 
 cur_dir=$(pwd)
-script_dir=$(dirname $(readlink -e "$0"))
 
-if [ "$cur_dir" == "$script_dir" ]
+if [ "$cur_dir" == "$HOME" ]
 then
-echo "$script_dir"
+echo "$cur_dir"
 exit 0
 fi
 
