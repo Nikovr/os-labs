@@ -21,7 +21,6 @@ fi
 
 touch "./emails.lst"
 
-
 for file in $directory/*
 do
 	if [[ -f $file && -r $file ]]
