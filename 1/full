@@ -1,0 +1,57 @@
+#!/bin/bash
+
+if [[ "$1" == "-h" && -z "$2" ]]
+then
+echo "This script creates a file full.log, which contains of all lines containing warnings and information from X.log"
+exit
+fi
+
+file="/var/log/anaconda/X.log"
+
+if ! [ -f $file ]
+then
+echo "error: File X.log does not exist"
+exit
+fi
+
+new_file="./full.log"
+wrn_msg="Warning: "
+inf_msg="Information: "
+
+if [ -f $new_file ]
+then
+rm $new_file
+fi
+
+touch $new_file 
+
+IFS=$'\n'
+for str in $(cat $file)
+do
+	IFS=$' '
+	for entry in $str
+	do
+		if [ $entry == "(WW)" ]
+		then
+		echo ${str/(WW)/$wrn_msg} >> $new_file
+		break
+		fi
+	done
+	IFS=$'\n'
+done
+
+for str in $(cat $file)
+do
+	IFS=$' '
+	for entry in $str
+	do
+		if [ $entry == "(II)" ]
+		then
+		echo ${str/(II)/$inf_msg} >> $new_file
+		break
+		fi
+	done
+	IFS=$'\n'
+done
+
+less $new_file
