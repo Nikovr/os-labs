@@ -29,6 +29,15 @@ To see their respective functionality you can run:
 ```
 
 ## Lab 2
+Linux process and resource monitoring
+
+**researched topics**
+
+1. Getting info about ongoing processes
+2. Getting info about resources that are used by ongoing processes
+3. Showcasing the results in a nice way in order to analyse the data
+
+## Lab 3
 Linux processes management 
 
-**in development**
+*in development...*
