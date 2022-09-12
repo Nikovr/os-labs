@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ -f "./2out" ]
+then
+	rm "./2out"
+else
+	touch "./2out"
+fi
+
+ps aux | grep -E ' +/sbin/' | awk '{print $2;}' >> "./2out"
+
+cat 2out
