@@ -1,0 +1,43 @@
+#!/bin/bash
+
+if [ -f "./4out" ]
+then
+	rm "./4out"
+else
+	touch "./4out"
+fi
+
+if [ -f "./tmp" ]
+then
+	rm "./tmp"
+else
+	touch "./tmp"
+fi
+
+OIFS=$IFS
+IFS=$'\n'
+
+for line in $(ps aux --no-headers)
+do
+	IFS=$OIFS
+	arr=($line)
+	pid=${arr[1]}
+	path="/proc/$pid"
+	if [ -e $path ]
+	then
+		ppid=$(cat $path/status | grep "PPid" | awk {'print $2;'})
+
+		ser=$(cat $path/sched | grep "se.sum_exec_runtime" | awk {'print $3;'})
+		ns=$(cat $path/sched | grep "nr_switches" | awk {'print $3'})
+		art=$(echo "scale=6; $ser/$ns" | bc | sed 's/^\./0./')
+	else
+		continue
+	fi
+
+	IFS=$'\n'
+	echo $pid $ppid $art >> "./tmp"
+done
+
+IFS=$OIFS
+sort -nk 2 "./tmp" | awk '{print "ProcessID="$1": Parent_ProcessID="$2": Average_Running_Time="$3;}' >> "./4out"
+rm "./tmp"

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ -f "./1out" ]
+then
+	rm "./1out"
+else
+	touch "./1out"
+fi
+
+ps -U $USER --no-headers | wc -l >> "./1out"
+ps -U $USER --no-headers | awk '{print $1":"$4;}' >> "./1out"
+
+cat "./1out"
+

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ps aux | tail -6 $n | head -n 1 | awk '{print $2;}'

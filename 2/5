@@ -1,0 +1,78 @@
+#!/bin/bash
+
+if ! [ -f "./4out" ]
+then
+	echo "error: File 4out does not exist in this directory. Try typing ./4"	
+	exit
+fi
+
+if ! [ -r "./4out" ]
+then
+	echo "error: File 4out can not be read"
+	exit
+fi
+
+if ! [ -w "./4out" ]
+then
+	echo "error: File 4out can not be overwritten"
+	exit
+fi
+
+if [ -f "./tmp" ]
+then
+	rm "./tmp"
+fi
+
+touch "./tmp"
+
+file="./4out"
+
+OIFS=$IFS
+IFS=$'\n'
+
+counter=0
+sum_art=0
+N=""
+
+for line in $(cat $file)
+do
+	nums=$(echo $line | grep -oE '[0-9.]+')
+	IFS=$OIFS
+	array=(${nums})
+	pid=${array[0]}
+	ppid=${array[1]}
+	art=${array[2]}
+
+	if [ -z $N ]
+	then
+		N=$ppid
+		counter=$((counter+1))
+		sum_art=$(echo "$sum_art + $art" | bc)
+		IFS=$'\n'
+		echo $line >> "./tmp"
+		continue
+	else
+
+		if [ $ppid -gt $N ]
+		then
+			M=$(echo "scale=6; $sum_art/$counter" | bc | sed 's/^\./0./')
+			echo "Average_Sleeping_Children_of_ParentID="$N" is "$M >> "./tmp"
+			N=$ppid
+			counter=1
+			sum_art=$art
+		else
+			counter=$((counter+1))
+			sum_art=$(echo "$sum_art + $art" | bc)
+
+		fi
+
+		IFS=$'\n'
+		echo $line >> "./tmp"
+	fi
+done
+
+M=$(echo "scale=6; $sum_art/$counter" | bc | sed 's/^\./0./')
+echo "Average_Sleeping_Children_of_ParentID="$N" is "$M >> "./tmp"
+
+cp "./tmp" "./4out"
+rm "./tmp"

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+OIFS=$IFS
+IFS=$'\n'
+
+maxres=0
+for line in $(ps aux --no-headers)
+do
+	IFS=$OIFS
+	arr=($line)
+	pid=${arr[1]}
+	path="/proc/$pid"
+	IFS=$'\n'
+	if [ -e $path ]
+	then
+		res=$(sudo awk '/Rss:/{ sum += $2 } END {print sum}' $path/smaps)
+	else
+		continue
+	fi
+
+	if [[ $res -gt $maxres ]]
+	then
+		maxres=$res
+		maxpid=$pid
+	fi
+done
+
+total_mem=$(awk '/MemTotal:/{ print $2 }' /proc/meminfo)
+mem=$(echo "scale=4; $maxres/$total_mem*100" | bc | sed '/\./ s/\.\{0,1\}0\{1,\}$//')
+
+echo "./6 output:"
+echo "PID:"$maxpid" RES:"$maxres" %MEM:"$mem
+echo -e "\n"
+echo "top output:"
+top -o %MEM -n 1 | sed -n 7,8p
+

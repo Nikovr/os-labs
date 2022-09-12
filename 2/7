@@ -1,0 +1,66 @@
+#!/bin/bash
+
+if [ -f "./tmp" ]
+then
+	rm "./tmp"
+else
+	touch "./tmp"
+fi
+
+if [ -f "./tmp1" ]
+then
+	rm "./tmp1"
+else
+	touch "./tmp1"
+fi
+
+OIFS=$IFS
+IFS=$'\n'
+
+for line in $(ps aux --no-headers)
+do
+	IFS=$OIFS
+	arr=($line)
+	pid=${arr[1]}
+	str=${arr[11]}
+	path="/proc/$pid"
+	IFS=$'\n'
+	if [ -e $path ]
+	then
+		rb=$(sudo awk '/read_bytes:/{print $2}' $path/io)
+		echo $pid $rb "$str" >> "./tmp"
+	else
+		continue
+	fi
+
+done
+
+echo "waiting 1 minute for existing processes to read bytes from disk..."
+sleep 60
+
+for line in $(sudo cat "./tmp")
+do
+	IFS=$OIFS
+	arr=($line)
+	pid=${arr[0]}
+	rb=${arr[1]}
+	str=${arr[2]}
+	path="/proc/$pid"
+	IFS=$'\n'
+	if [ -e $path ]
+	then
+		new_rb=$(sudo awk '/read_bytes:/{print $2}' $path/io)
+		delta_rb=$((new_rb-rb))
+		echo $pid:$str:$delta_rb >> "./tmp1"
+	else
+		continue
+	fi
+
+done
+
+rm "./tmp"
+IFS=":"
+sort -nk 3 "./tmp1" | head -n 3
+
+rm "./tmp1"
+
